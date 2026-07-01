@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover"
+/>
+<title>Mecenat</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :root {
+    --teal: #16a3bd;         /* Mecenat brand teal */
+    --teal-dark: #0f8ca3;
+    --orange: #ef7f1a;       /* campaign / pulse orange */
+    --ink: #1b1e24;
+    --muted: #8b909a;
+    --bg: #eef0f3;
+    --nav-h: 66px;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior-y: none;
+    background: #d8dbe0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    position: fixed;
+    inset: 0;
+    max-width: 460px;
+    margin: 0 auto;
+    background: var(--bg);
+    box-shadow: 0 0 60px rgba(0,0,0,.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---------- Screens ---------- */
+  .screen {
+    position: absolute;
+    inset: 0;
+    bottom: var(--nav-h);
+    display: none;
+    flex-direction: column;
+  }
+  .screen.active { display: flex; }
+  .scroll {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ---------- Generic teal header ---------- */
+  .topbar {
+    flex: 0 0 auto;
+    background: var(--teal);
+    color: #fff;
+    padding: calc(env(safe-area-inset-top) + 12px) 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .topbar .close, .topbar .back {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(20%);
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .topbar .close svg { width: 22px; height: 22px; }
+
+  /* ================= HEM (home) ================= */
+  .home-head {
+    background: var(--teal);
+    padding: calc(env(safe-area-inset-top) + 12px) 16px 16px;
+  }
+  .searchrow { display: flex; align-items: center; gap: 12px; }
+  .search {
+    flex: 1;
+    background: #eef1f4;
+    border-radius: 30px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    color: #9aa0aa;
+    font-size: 15px;
+  }
+  .search svg { width: 18px; height: 18px; color: #6b7280; flex: 0 0 auto; }
+  .home-head .hicon { color: #fff; display: grid; place-items: center; }
+  .home-head .hicon svg { width: 24px; height: 24px; }
+
+  .home-body { padding: 16px; }
+
+  .banner {
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(150deg, #a03d63 0%, #d15b39 55%, #ef8a2a 100%);
+    color: #fff;
+    padding: 26px 22px 24px;
+    text-align: center;
+    box-shadow: 0 10px 24px -10px rgba(180,80,40,.6);
+  }
+  .banner h1 { font-size: 30px; font-weight: 900; letter-spacing: -.5px; line-height: 1; }
+  .banner p { margin: 14px auto 18px; font-size: 15px; font-weight: 700; max-width: 320px; line-height: 1.35; }
+  .banner .cta {
+    display: inline-block;
+    background: var(--orange);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 13px 26px;
+    border-radius: 30px;
+    border: none;
+    box-shadow: 0 6px 14px -4px rgba(0,0,0,.35);
+  }
+
+  .sec-title {
+    margin: 26px 4px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.4px;
+  }
+  .sec-title svg { width: 26px; height: 26px; color: var(--ink); }
+
+  .hscroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scroll-snap-type: x mandatory;
+  }
+  .hscroll::-webkit-scrollbar { display: none; }
+  .promo {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px -10px rgba(0,0,0,.25);
+  }
+  .promo .thumb {
+    height: 120px;
+    position: relative;
+    background: linear-gradient(135deg,#cbd2da,#9aa6b2);
+  }
+  .promo .thumb.z { background: linear-gradient(135deg,#d8d2c8,#b6a894); }
+  .promo .thumb.l { background: linear-gradient(135deg,#e8a5b0,#d76b7f); }
+  .kampanj {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--orange); color: #fff;
+    font-size: 12px; font-weight: 800; letter-spacing: .5px;
+    padding: 5px 10px; border-radius: 6px;
+  }
+  .promo .brand {
+    position: absolute; left: 50%; bottom: -18px; transform: translateX(-50%);
+    background: #fff; border-radius: 12px 12px 0 0;
+    padding: 8px 22px; font-weight: 800; font-size: 15px; color: #222;
+    box-shadow: 0 -2px 6px rgba(0,0,0,.05);
+  }
+  .promo .body { padding: 24px 16px 16px; text-align: center; }
+  .promo .body h3 { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .promo .body .terms { color: var(--orange); font-weight: 700; font-size: 14px; margin-top: 8px; }
+  .promo .body .btn {
+    margin-top: 14px; width: 100%;
+    background: var(--teal); color: #fff; border: none;
+    border-radius: 30px; padding: 13px; font-weight: 700; font-size: 15px;
+  }
+
+  /* ================= KORT (card) ================= */
+  #screen-kort .scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px;
+  }
+  .card-logo {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 26px;
+  }
+  .card-logo .mec { height: 30px; }
+
+  /* KORT landing page (shown behind the fullscreen card) */
+  #screen-kort .scroll { gap: 0; }
+  .kort-landing { text-align: center; }
+  .kort-landing .mec { height: 40px; margin-bottom: 10px; }
+  .kort-landing .sub { font-size: 15px; color: var(--muted); margin-bottom: 26px; }
+  .open-card-btn {
+    position: relative;
+    width: 100%; max-width: 300px;
+    aspect-ratio: 1.586 / 1;
+    border: none; cursor: pointer;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fbfcfd 0%, #eceef1 40%, #dfe3e8 62%, #f2f4f6 100%);
+    box-shadow: 0 16px 34px -14px rgba(40,55,80,.45), inset 0 1px 0 rgba(255,255,255,.8);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    color: #4a5568; font: inherit; font-size: 15px; font-weight: 600;
+  }
+  .open-card-btn:active { transform: scale(.985); }
+  .open-card-btn .mec { height: 30px; }
+  .open-card-btn .tap { display: flex; align-items: center; gap: 7px; color: var(--teal); font-weight: 700; }
+  .open-card-btn .tap svg { width: 18px; height: 18px; }
+
+  /* The physical card (landscape credit-card) */
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    aspect-ratio: 1.586 / 1;
+    border-radius: 18px;
+    overflow: hidden;
+    isolation: isolate;
+    cursor: pointer;
+    padding: 16px 18px;
+    color: #1b1e24;
+    background:
+      linear-gradient(135deg, #fbfcfd 0%, #eceef1 40%, #dfe3e8 62%, #f2f4f6 100%);
+    box-shadow:
+      0 22px 44px -16px rgba(40,55,80,.45),
+      0 2px 6px rgba(0,0,0,.08),
+      inset 0 1px 0 rgba(255,255,255,.8);
+    display: flex;
+    flex-direction: column;
+  }
+  .card:active { transform: scale(.992); }
+  .card > * { position: relative; z-index: 2; }
+
+  .card-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .card-top .mec-mark { height: 30px; }
+  .card-sid { text-align: right; font-size: 10px; line-height: 1.4; color: #55606f; font-weight: 600; }
+
+  /* Body: number/name/dob on the left, DISCOUNTS + verified box on the right */
+  .card-body {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-left { display: flex; flex-direction: column; min-width: 0; }
+  .card-number {
+    font-size: clamp(18px, 5.6vw, 24px);
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+    color: #222831;
+    margin-bottom: 8px;
+    white-space: nowrap;
+  }
+  .card-name .ln { font-size: clamp(16px, 4.6vw, 20px); font-weight: 700; line-height: 1.2; }
+  .card-name .fn { font-size: clamp(16px, 4.6vw, 20px); font-weight: 500; line-height: 1.2; }
+  .card-dob { margin-top: 4px; font-size: clamp(14px, 4vw, 17px); font-weight: 500; color: #333b46; }
+
+  .card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+  .card-valid { text-align: right; }
+  .card-valid .dvt { font-size: 7px; font-weight: 800; letter-spacing: .8px; color: #55606f; }
+  .card-valid .date { font-size: clamp(14px, 3.8vw, 16px); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .verified-row { display: flex; align-items: flex-end; gap: 8px; }
+  .logo-sj { height: 22px; width: auto; display: block; object-fit: contain; }
+
+  /* Verified box: VERIFIED BY / OW / Mecenat stack, then [book][SL] row */
+  .verified {
+    border: 1px solid #b8c0cc;
+    border-radius: 8px;
+    background: rgba(255,255,255,.55);
+    padding: 6px 10px 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .mec-stack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .mec-stack .vlabel { font-size: 6.5px; font-weight: 800; letter-spacing: 1px; color: #55606f; }
+  .mec-stack .v-ow { height: 26px; width: auto; margin-top: 3px; overflow: visible; }
+  .mec-stack .v-text { height: 13px; width: auto; margin-top: 3px; overflow: visible; }
+
+  .mini-col {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    border: 1px solid #c2cad4;
+    border-radius: 6px;
+    padding: 3px 6px;
+  }
+  .mini-col .logo-book { height: 20px; width: auto; display: block; object-fit: contain; }
+  .mini-col .logo-sl { height: 26px; width: auto; display: block; object-fit: contain; }
+
+  /* Pulsing orange rings — 2 rings, 3s cycle */
+  .pulse-wrap {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 5;
+  }
+  .pulse-ring {
+    position: absolute;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 3px solid var(--orange);
+    opacity: 0;
+    animation: ringPulse 3s cubic-bezier(.2,.6,.3,1) infinite;
+  }
+  .pulse-ring:nth-child(2) { animation-delay: 1.5s; }
+  @keyframes ringPulse {
+    0%   { transform: scale(.4); opacity: 0; }
+    12%  { opacity: .9; }
+    100% { transform: scale(2.3); opacity: 0; }
+  }
+
+  .card-valid { text-align: right; }
+  .card-valid .dvt { font-size: 6.5px; font-weight: 800; letter-spacing: .8px; color: #55606f; }
+  .card-valid .date { font-size: clamp(13px, 3.6vw, 15px); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* live clock under card */
+  .clock { margin-top: 22px; text-align: center; }
+  .clock .t {
+    font-size: 26px; font-weight: 700; letter-spacing: 1.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .clock .c {
+    margin-top: 4px; font-size: 12px; color: var(--muted); font-weight: 500;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--orange);
+    animation: liveblink 1.6s infinite; }
+  @keyframes liveblink { 0%,100%{opacity:1} 50%{opacity:.25} }
+  .tap-hint { margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .link-btn {
+    margin-top: 12px; background: none; border: none; cursor: pointer;
+    color: var(--teal); font: inherit; font-size: 14px; font-weight: 700;
+  }
+  .link-btn:active { opacity: .6; }
+
+  /* ---------- Fullscreen rotated card ---------- */
+  .fullcard {
+    position: fixed; inset: 0; z-index: 100;
+    background: #000;
+    display: none; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .fullcard.active { display: flex; }
+  .fc-holder { display: flex; align-items: center; justify-content: center; }
+  .fc-holder .card {
+    max-width: none;                /* override portrait cap */
+    width: 430px;                   /* fixed base; JS rotates + scales to fit */
+    cursor: pointer;
+    transform-origin: center center;
+    box-shadow: 0 0 46px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.8);
+  }
+  /* "Valid thru" caption under the card */
+  .fc-caption {
+    position: absolute; left: 0; right: 0;
+    bottom: calc(env(safe-area-inset-bottom) + 84px);
+    color: #fff; font-size: 15px; font-weight: 600; letter-spacing: .3px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .fc-caption img { height: 18px; width: auto; filter: invert(1) brightness(2); object-fit: contain; }
+  .fc-close {
+    position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 16px);
+    transform: translateX(-50%);
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #fff; border: none; cursor: pointer;
+    display: grid; place-items: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,.45);
+  }
+  .fc-close svg { width: 26px; height: 26px; color: #111; }
+  .fc-close:active { transform: translateX(-50%) scale(.94); }
+
+  /* ================= DETAIL (student page) ================= */
+  #screen-detail .scroll { padding: 14px; }
+  .panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px -10px rgba(0,0,0,.25);
+  }
+  .d-head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .d-head .who h2 { font-size: 22px; font-weight: 800; }
+  .d-head .who .ln { margin-top: 12px; font-size: 20px; font-weight: 500; }
+  .d-head .who .fn { font-size: 20px; font-weight: 500; }
+  .d-head .who .dob { margin-top: 6px; font-size: 17px; }
+  .d-head .vbox {
+    border: 1px solid #ccd2da; border-radius: 8px; padding: 8px 12px; text-align: center;
+    min-width: 116px;
+  }
+  .d-head .vbox .vlabel { font-size: 9px; font-weight: 800; letter-spacing: .8px; color: #55606f; }
+  .d-head .vbox .mec { height: 30px; margin-top: 6px; }
+  .d-dvt { text-align: right; font-size: 11px; font-weight: 800; letter-spacing: .5px; color: #55606f; }
+  .d-dvt .date { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: 0; }
+  .d-note { margin-top: 16px; font-size: 15px; color: #3a3f48; line-height: 1.4; }
+
+  .trow { display: flex; align-items: center; gap: 16px; padding: 12px 0; }
+  .trow + .trow { border-top: 1px solid #eef0f3; }
+  .trow .ticon { width: 54px; display: grid; place-items: center; }
+  .trow .ticon svg { height: 30px; width: auto; }
+  .trow .ticon img { height: 38px; width: 48px; object-fit: contain; }
+  .trow .tv { font-size: 16px; }
+
+  .table .r { display: flex; padding: 12px 4px; }
+  .table .r + .r { border-top: 1px solid #eef0f3; }
+  .table .k { width: 42%; font-size: 12px; font-weight: 800; letter-spacing: .5px; color: #6b7280; align-self: center; }
+  .table .v { font-size: 16px; }
+
+  /* ================= EDIT ================= */
+  #screen-edit .scroll { padding: 16px; }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 700; letter-spacing: .4px;
+    text-transform: uppercase; color: #6b7280; margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%; height: 48px; border: 1.5px solid #d7dbe1; border-radius: 12px;
+    padding: 0 14px; font-size: 16px; font-family: inherit; color: var(--ink);
+    background: #fff; outline: none;
+    -webkit-user-select: text; user-select: text;
+  }
+  .field input:focus { border-color: var(--teal); }
+  .save-btn {
+    width: 100%; height: 52px; margin-top: 6px;
+    background: var(--teal); color: #fff; border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer;
+  }
+  .save-btn:active { background: var(--teal-dark); }
+  .edit-intro { font-size: 14px; color: #55606f; margin-bottom: 18px; line-height: 1.4; }
+  .saved-toast {
+    position: fixed; left: 50%; bottom: calc(var(--nav-h) + 20px); transform: translateX(-50%);
+    background: #1b1e24; color: #fff; padding: 12px 20px; border-radius: 30px;
+    font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease; z-index: 50;
+  }
+  .saved-toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
+  /* placeholder screens */
+  .placeholder {
+    flex: 1; display: grid; place-items: center; text-align: center;
+    color: var(--muted); padding: 40px;
+  }
+  .placeholder svg { width: 54px; height: 54px; margin-bottom: 14px; opacity: .5; }
+
+  /* ================= Bottom nav ================= */
+  .nav {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: #fff; border-top: 1px solid #e6e9ee;
+    display: flex; z-index: 20;
+  }
+  .nav button {
+    flex: 1; border: none; background: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; color: #2b2f36; font: inherit; font-size: 10px; font-weight: 600;
+  }
+  .nav button svg { width: 24px; height: 24px; }
+  .nav button.active { color: var(--teal); }
+  .nav button:active { opacity: .6; }
+</style>
+</head>
+<body>
+
+<!-- ===== Reusable Mecenat logo (official paths) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- OW symbol (complete: 3 teal paths) -->
+  <symbol id="owMark" viewBox="0.3 0.88 188.5 91.5">
+    <path fill="#10A5C5" fill-rule="evenodd" clip-rule="evenodd" d="M142.758 78.272h30.132c1.241 0 2.285-1.065 2.285-2.328V5.29h-8.844c-.003 0 0 53.075 0 64.01H152.08V5.29h-8.879l.019 70.663c0 .822-.197 1.59-.462 2.318Z"/>
+    <path fill="#10A5C5" fill-rule="evenodd" clip-rule="evenodd" d="M179.599 5.29v70.654c0 3.756-3.01 6.815-6.709 6.815l-72.61.023H15.849c-3.693 0-6.7-3.053-6.7-6.806V16.678c0-3.753 3.007-6.803 6.7-6.803l84.466-.013c3.693 0 6.7 3.06 6.7 6.816v59.308c0 .813-.198 1.567-.457 2.286h29.973c1.248 0 2.266-1.04 2.266-2.318l-.019-70.663h-8.812V69.3h-14.117V16.648c0-8.7-6.983-15.771-15.569-15.771H15.849C7.276.878.302 7.948.302 16.648v59.296c0 8.7 6.974 15.78 15.547 15.78l157.05.013c8.573 0 15.547-7.077 15.547-15.77V5.29h-8.847Z"/>
+    <path fill="#10A5C5" fill-rule="evenodd" clip-rule="evenodd" d="M15.849 14.36c-1.255 0-2.276 1.042-2.276 2.318v59.298c0 1.28 1.021 2.319 2.276 2.319h79.727v-.023h4.806a2.283 2.283 0 0 0 1.421-.612c.028-.03.076-.02.102-.049a2.31 2.31 0 0 0 .673-1.635h.013V16.678c0-1.263-1.044-2.328-2.276-2.328l-84.466.01Zm77.885 54.93H22.417V23.312h71.317V69.29Z"/>
+  </symbol>
+  <!-- "Mecenat" wordmark text only -->
+  <symbol id="mecText" viewBox="235 0 640 141">
+    <path fill="#222" fill-rule="evenodd" clip-rule="evenodd" d="M238.842 5.365h12l53.147 128.508h.383L356.945 5.365h12.007v137.978h-8.382V15.8h-.379l-51.823 127.543h-8.381L247.603 15.8h-.38v127.543h-8.381V5.365Zm144.976 82.902c1.526-19.712 14.289-40.196 36.002-40.196 22.482 0 35.43 19.325 35.816 40.196h-71.818Zm79.054 6.375c1.334-28.405-12.384-52.947-43.052-52.947-29.523 0-43.626 26.475-43.24 53.72-.386 27.44 14.668 50.246 43.24 50.246 23.238 0 38.478-12.753 42.295-35.945h-7.245c-3.427 18.358-16.571 29.567-35.05 29.567-24.189 0-36.385-21.255-36.002-44.641h79.054Zm84.961-19.902c-1.334-17.588-15.428-26.67-33.145-26.67-24.572 0-37.716 22.03-37.716 44.642 0 26.86 12.378 46.571 37.716 46.571 18.285 0 31.623-12.753 34.096-30.917h7.242c-3.24 23.765-20.193 37.295-41.338 37.295-31.811 0-44.961-25.315-44.961-52.949 0-27.637 16.007-51.017 44.961-51.017 21.145 0 38.287 10.432 40.384 33.045h-7.239Zm22.785 13.527c1.519-19.712 14.283-40.196 36.005-40.196 22.479 0 35.43 19.325 35.807 40.196h-71.812Zm79.054 6.375c1.337-28.405-12.377-52.947-43.049-52.947-29.529 0-43.626 26.475-43.247 53.72-.379 27.44 14.669 50.246 43.247 50.246 23.241 0 38.478-12.753 42.283-35.945h-7.239c-3.428 18.358-16.568 29.567-35.044 29.567-24.196 0-36.385-21.255-36.005-44.641h79.054Zm10.289-50.628h7.233v21.258h.376c4.957-14.883 19.817-23.577 35.06-23.577 34.48 0 34.856 28.016 34.856 40.193v61.455h-7.232V80.538c0-10.244-1.143-32.467-27.812-32.467-21.91 0-35.248 17.201-35.248 41.549v53.723h-7.233v-99.33Zm155.736 61.455c0 5.212-3.622 33.814-36.579 33.814-17.146 0-25.718-9.664-25.718-21.641 0-14.883 9.715-21.067 26.86-23 14.101-1.93 29.718-1.156 35.437-7.729v18.556Zm7.232-37.882c0-20.481-17.135-25.892-34.287-25.892-23.044 0-36.385 11.015-37.33 32.85h7.233c.954-17.199 12.575-26.474 30.097-26.474 22.29 0 27.237 15.074 27.237 19.516 0 16.234-1.324 18.361-33.713 20.68-16.191 1.353-36.005 6.184-36.005 29.375 0 20.864 14.283 28.019 32.769 28.019 18.664 0 31.814-10.244 36.381-22.032h.386v5.219c0 8.117 1.711 14.495 13.143 14.495 1.899 0 3.811-.388 5.902-.777v-6.184c-2.279.392-4.003.583-5.327.583-6.486 0-6.486-6.184-6.486-11.983V67.587Zm55.248-17.198h-21.336v69.377c0 16.04 7.43 17.584 21.144 17.199v6.378c-14.857.968-29.143-1.159-28.386-23.577V50.389h-18.087v-6.375h18.087v-30.92h7.242v30.92h21.336v6.375Z"/>
+  </symbol>
+  <!-- Full lockup: OW + Mecenat (official viewBox) -->
+  <symbol id="mecFull" viewBox="0.3 0.88 877.87 144.78">
+    <path fill="#10A5C5" fill-rule="evenodd" clip-rule="evenodd" d="M142.758 78.272h30.132c1.241 0 2.285-1.065 2.285-2.328V5.29h-8.844c-.003 0 0 53.075 0 64.01H152.08V5.29h-8.879l.019 70.663c0 .822-.197 1.59-.462 2.318Z"/>
+    <path fill="#10A5C5" fill-rule="evenodd" clip-rule="evenodd" d="M179.599 5.29v70.654c0 3.756-3.01 6.815-6.709 6.815l-72.61.023H15.849c-3.693 0-6.7-3.053-6.7-6.806V16.678c0-3.753 3.007-6.803 6.7-6.803l84.466-.013c3.693 0 6.7 3.06 6.7 6.816v59.308c0 .813-.198 1.567-.457 2.286h29.973c1.248 0 2.266-1.04 2.266-2.318l-.019-70.663h-8.812V69.3h-14.117V16.648c0-8.7-6.983-15.771-15.569-15.771H15.849C7.276.878.302 7.948.302 16.648v59.296c0 8.7 6.974 15.78 15.547 15.78l157.05.013c8.573 0 15.547-7.077 15.547-15.77V5.29h-8.847Z"/>
+    <path fill="#10A5C5" fill-rule="evenodd" clip-rule="evenodd" d="M15.849 14.36c-1.255 0-2.276 1.042-2.276 2.318v59.298c0 1.28 1.021 2.319 2.276 2.319h79.727v-.023h4.806a2.283 2.283 0 0 0 1.421-.612c.028-.03.076-.02.102-.049a2.31 2.31 0 0 0 .673-1.635h.013V16.678c0-1.263-1.044-2.328-2.276-2.328l-84.466.01Zm77.885 54.93H22.417V23.312h71.317V69.29Z"/>
+    <path fill="#222" fill-rule="evenodd" clip-rule="evenodd" d="M238.842 5.365h12l53.147 128.508h.383L356.945 5.365h12.007v137.978h-8.382V15.8h-.379l-51.823 127.543h-8.381L247.603 15.8h-.38v127.543h-8.381V5.365Zm144.976 82.902c1.526-19.712 14.289-40.196 36.002-40.196 22.482 0 35.43 19.325 35.816 40.196h-71.818Zm79.054 6.375c1.334-28.405-12.384-52.947-43.052-52.947-29.523 0-43.626 26.475-43.24 53.72-.386 27.44 14.668 50.246 43.24 50.246 23.238 0 38.478-12.753 42.295-35.945h-7.245c-3.427 18.358-16.571 29.567-35.05 29.567-24.189 0-36.385-21.255-36.002-44.641h79.054Zm84.961-19.902c-1.334-17.588-15.428-26.67-33.145-26.67-24.572 0-37.716 22.03-37.716 44.642 0 26.86 12.378 46.571 37.716 46.571 18.285 0 31.623-12.753 34.096-30.917h7.242c-3.24 23.765-20.193 37.295-41.338 37.295-31.811 0-44.961-25.315-44.961-52.949 0-27.637 16.007-51.017 44.961-51.017 21.145 0 38.287 10.432 40.384 33.045h-7.239Zm22.785 13.527c1.519-19.712 14.283-40.196 36.005-40.196 22.479 0 35.43 19.325 35.807 40.196h-71.812Zm79.054 6.375c1.337-28.405-12.377-52.947-43.049-52.947-29.529 0-43.626 26.475-43.247 53.72-.379 27.44 14.669 50.246 43.247 50.246 23.241 0 38.478-12.753 42.283-35.945h-7.239c-3.428 18.358-16.568 29.567-35.044 29.567-24.196 0-36.385-21.255-36.005-44.641h79.054Zm10.289-50.628h7.233v21.258h.376c4.957-14.883 19.817-23.577 35.06-23.577 34.48 0 34.856 28.016 34.856 40.193v61.455h-7.232V80.538c0-10.244-1.143-32.467-27.812-32.467-21.91 0-35.248 17.201-35.248 41.549v53.723h-7.233v-99.33Zm155.736 61.455c0 5.212-3.622 33.814-36.579 33.814-17.146 0-25.718-9.664-25.718-21.641 0-14.883 9.715-21.067 26.86-23 14.101-1.93 29.718-1.156 35.437-7.729v18.556Zm7.232-37.882c0-20.481-17.135-25.892-34.287-25.892-23.044 0-36.385 11.015-37.33 32.85h7.233c.954-17.199 12.575-26.474 30.097-26.474 22.29 0 27.237 15.074 27.237 19.516 0 16.234-1.324 18.361-33.713 20.68-16.191 1.353-36.005 6.184-36.005 29.375 0 20.864 14.283 28.019 32.769 28.019 18.664 0 31.814-10.244 36.381-22.032h.386v5.219c0 8.117 1.711 14.495 13.143 14.495 1.899 0 3.811-.388 5.902-.777v-6.184c-2.279.392-4.003.583-5.327.583-6.486 0-6.486-6.184-6.486-11.983V67.587Zm55.248-17.198h-21.336v69.377c0 16.04 7.43 17.584 21.144 17.199v6.378c-14.857.968-29.143-1.159-28.386-23.577V50.389h-18.087v-6.375h18.087v-30.92h7.242v30.92h21.336v6.375Z"/>
+  </symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ========================= HEM ========================= -->
+  <section class="screen" id="screen-hem">
+    <div class="home-head">
+      <div class="searchrow">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          Hitta dina studentrabatter
+        </div>
+        <span class="hicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.4-7 10-7 10Z"/></svg></span>
+        <span class="hicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5Z"/></svg></span>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="home-body">
+        <div class="banner">
+          <h1>SEJFA ❤️ STUDENTER</h1>
+          <p>Just nu! Teckna Sejfas hemförsäkring med 40&nbsp;% studentrabatt – få biljett till Way Out West på köpet.</p>
+          <button class="cta">Till kampanjen</button>
+        </div>
+
+        <div class="sec-title">Somriga studentrabatter ☀️
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="hscroll">
+          <div class="promo">
+            <div class="thumb z"><span class="kampanj">KAMPANJ</span><span class="brand">zalando</span></div>
+            <div class="body">
+              <h3>Upp till 70&nbsp;% + 10&nbsp;% extra studentrabatt</h3>
+              <div class="terms">Gäller nya kunder vid köp öv…</div>
+              <button class="btn">Till rabatten</button>
+            </div>
+          </div>
+          <div class="promo">
+            <div class="thumb l"><span class="kampanj">KAMPANJ</span><span class="brand">Liseberg</span></div>
+            <div class="body">
+              <h3>Upp till 25&nbsp;% studentrabatt Entré &amp; åkband</h3>
+              <div class="terms">Gäller utvalda datum…</div>
+              <button class="btn">Till rabatten</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-title">Mat &amp; annat gott
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="hscroll">
+          <div class="promo">
+            <div class="thumb" style="background:linear-gradient(135deg,#f4c9d4,#e79ab0)"><span class="kampanj">KAMPANJ</span><span class="brand">Foodora</span></div>
+            <div class="body"><h3>Fri leverans i 30 dagar</h3><div class="terms">Gäller nya kunder…</div><button class="btn">Till rabatten</button></div>
+          </div>
+          <div class="promo">
+            <div class="thumb" style="background:linear-gradient(135deg,#f6d38a,#e79b3a)"><span class="kampanj">KAMPANJ</span><span class="brand">MatHem</span></div>
+            <div class="body"><h3>15&nbsp;% på din första kasse</h3><div class="terms">Gäller utvalda…</div><button class="btn">Till rabatten</button></div>
+          </div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= UTFORSKA ========================= -->
+  <section class="screen" id="screen-utforska">
+    <div class="topbar">Utforska</div>
+    <div class="scroll placeholder">
+      <div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <div>Utforska alla studentrabatter</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= KORT ========================= -->
+  <section class="screen active" id="screen-kort">
+    <div class="scroll">
+      <div class="kort-landing">
+        <svg class="mec" viewBox="0.3 0.88 877.87 144.78"><use href="#mecFull"/></svg>
+        <div class="sub">Ditt digitala studentkort</div>
+
+        <button class="open-card-btn" id="openCardBtn">
+          <svg class="mec" viewBox="0.3 0.88 877.87 144.78" style="height:26px"><use href="#mecFull"/></svg>
+          <span class="tap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v4M9 21H5a2 2 0 0 1-2-2v-4M21 3l-7 7M3 21l7-7"/></svg>
+            Tryck för att visa kortet
+          </span>
+        </button>
+
+        <div class="clock">
+          <div class="t" id="clock">--:--:--</div>
+          <div class="c"><span class="live-dot"></span> Live · uppdateras varje sekund</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Card template (hidden) — cloned into the fullscreen view ===== -->
+  <div id="cardTemplate" style="display:none">
+    <div class="card" id="theCard" role="button" aria-label="Studentkort">
+      <div class="card-top">
+        <svg class="mec-mark" viewBox="0.3 0.88 877.87 144.78"><use href="#mecFull"/></svg>
+        <div class="card-sid">
+          STUDENT ID: <span id="c-sid">07310230</span><br/>
+          <span id="c-school">Yrkeshögskola</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-left">
+          <div class="card-number" id="c-number">9752 2382 5229 9901</div>
+          <div class="card-name">
+            <div class="ln" id="c-ln">Berglund</div>
+            <div class="fn" id="c-fn">Jonathan Tomas</div>
+          </div>
+          <div class="card-dob" id="c-dob">2003-05-17</div>
+        </div>
+
+        <div class="card-right">
+          <div class="card-valid">
+            <div class="dvt">DISCOUNTS VALID THRU</div>
+            <div class="date" id="c-dvt">2026-10-31</div>
+          </div>
+
+          <div class="verified-row">
+            <img class="logo-sj" src="assets/sj.png" alt="SJ" />
+            <div class="verified">
+              <div class="mec-stack">
+                <div class="pulse-wrap">
+                  <span class="pulse-ring"></span>
+                  <span class="pulse-ring"></span>
+                </div>
+                <div class="vlabel">VERIFIED BY</div>
+                <svg class="v-ow" viewBox="0.3 0.88 188.5 91.5"><use href="#owMark"/></svg>
+                <svg class="v-text" viewBox="235 0.88 645 144.78"><use href="#mecText"/></svg>
+              </div>
+              <div class="mini-col">
+                <img class="logo-book" src="assets/book.png" alt="" />
+                <img class="logo-sl" src="assets/sl.png" alt="SL" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================= KAMPANJER ========================= -->
+  <section class="screen" id="screen-kampanjer">
+    <div class="topbar">Kampanjer</div>
+    <div class="scroll placeholder">
+      <div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 8h.01M16 16h.01M7 7l10 10"/><circle cx="12" cy="12" r="10"/></svg>
+        <div>Alla aktuella kampanjer</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= DETAIL (student page) ========================= -->
+  <section class="screen" id="screen-detail">
+    <div class="topbar">
+      <span id="d-schooltitle">Yrkeshögskola</span>
+      <button class="close" id="detailClose" aria-label="Stäng">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="scroll">
+      <div class="panel">
+        <div class="d-head">
+          <div class="who">
+            <h2>STUDENT</h2>
+            <div class="ln" id="d-ln">Berglund</div>
+            <div class="fn" id="d-fn">Jonathan Tomas</div>
+            <div class="dob" id="d-dob">2003-05-17</div>
+          </div>
+          <div>
+            <div class="d-dvt">DISCOUNTS VALID THRU<div class="date" id="d-dvt">2026-10-31</div></div>
+            <div class="vbox" style="margin-top:10px">
+              <div class="vlabel">VERIFIED BY</div>
+              <svg class="v-ow" viewBox="0.3 0.88 188.5 91.5" style="height:26px"><use href="#owMark"/></svg>
+              <svg class="v-text" viewBox="235 0.88 645 144.78" style="height:17px"><use href="#mecText"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="d-note">The holder of this card is a student and is entitled to student discounts.</div>
+      </div>
+
+      <div class="panel">
+        <div class="trow">
+          <div class="ticon"><img src="assets/sj.png" alt="SJ" /></div>
+          <div class="tv">Valid thru <span id="t-sj">2026-10-31</span></div>
+        </div>
+        <div class="trow">
+          <div class="ticon"><img src="assets/book.png" alt="" /></div>
+          <div class="tv">Valid thru <span id="t-bus">2026-09-15</span></div>
+        </div>
+        <div class="trow">
+          <div class="ticon"><img src="assets/sl.png" alt="SL" /></div>
+          <div class="tv">Valid thru <span id="t-sl">2026-10-31</span></div>
+        </div>
+      </div>
+
+      <div class="panel table" style="padding:6px 12px">
+        <div class="r"><div class="k">STUDENT ID</div><div class="v" id="d-sid">07310230</div></div>
+        <div class="r"><div class="k">LÄROSÄTE</div><div class="v" id="d-school">Yrkeshögskola</div></div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+  </section>
+
+  <!-- ========================= EDIT (via NYHETER) ========================= -->
+  <section class="screen" id="screen-edit">
+    <div class="topbar">
+      Redigera kort
+      <button class="close" id="editClose" aria-label="Stäng">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="scroll">
+      <p class="edit-intro">Ändra uppgifterna nedan så uppdateras kortet och studentsidan direkt.</p>
+      <form id="editForm" autocomplete="off">
+        <div class="field"><label>Förnamn</label><input id="f-fn" type="text" /></div>
+        <div class="field"><label>Efternamn</label><input id="f-ln" type="text" /></div>
+        <div class="field"><label>Födelsedatum</label><input id="f-dob" type="text" placeholder="ÅÅÅÅ-MM-DD" /></div>
+        <div class="field"><label>Kortnummer</label><input id="f-number" type="text" inputmode="numeric" placeholder="1234 5678 9012 3456" /></div>
+        <div class="field"><label>Student ID</label><input id="f-sid" type="text" inputmode="numeric" /></div>
+        <div class="field"><label>Lärosäte</label><input id="f-school" type="text" /></div>
+        <div class="field"><label>Discounts valid thru</label><input id="f-dvt" type="text" placeholder="ÅÅÅÅ-MM-DD" /></div>
+        <div class="field"><label>Valid thru (kollektivtrafik)</label><input id="f-edge" type="text" placeholder="ÅÅÅÅ-MM-DD" /></div>
+        <button type="submit" class="save-btn">Spara ändringar</button>
+        <div style="height:24px"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========================= FULLSCREEN CARD ========================= -->
+  <div class="fullcard" id="fullcard">
+    <div class="fc-holder" id="fcHolder"></div>
+    <div class="fc-caption"><img src="assets/book.png" alt="" /><span id="fcCaption">Valid thru 2026-09-15</span></div>
+    <button class="fc-close" id="fcClose" aria-label="Stäng">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <!-- ========================= NAV ========================= -->
+  <nav class="nav">
+    <button data-tab="hem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+      HEM
+    </button>
+    <button data-tab="utforska">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M4 12h6M4 18h10"/><circle cx="17" cy="15" r="4"/><path d="m22 20-2.2-2.2"/></svg>
+      UTFORSKA
+    </button>
+    <button data-tab="kort" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="12" height="16" rx="2"/><path d="M8 8h4M8 12h4M8 16h2"/></svg>
+      KORT
+    </button>
+    <button data-tab="kampanjer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 2.4 1.8 3 .1 1 2.8 2.4 1.8-.9 2.9.9 2.9-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l.9-2.9-.9-2.9 2.4-1.8 1-2.8 3-.1z"/><path d="M9 15l6-6M9.5 9.5h.01M14.5 14.5h.01"/></svg>
+      KAMPANJER
+    </button>
+    <button data-tab="nyheter">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M8.5 8.5h.01M15.5 15.5h.01"/><circle cx="8.2" cy="8.2" r="1.6"/><circle cx="15.8" cy="15.8" r="1.6"/></svg>
+      NYHETER
+    </button>
+  </nav>
+
+  <div class="saved-toast" id="toast">Sparat ✓</div>
+</div>
+
+<script>
+  "use strict";
+
+  /* ---------- Data ---------- */
+  var DEFAULTS = {
+    fn: "Jonathan Tomas",
+    ln: "Berglund",
+    dob: "2003-05-17",
+    number: "9752 2382 5229 9901",
+    sid: "07310230",
+    school: "Yrkeshögskola",
+    dvt: "2026-10-31",
+    edge: "2026-09-15"
+  };
+
+  function load() {
+    try {
+      var raw = localStorage.getItem("mecenatCard");
+      if (raw) return Object.assign({}, DEFAULTS, JSON.parse(raw));
+    } catch (e) {}
+    return Object.assign({}, DEFAULTS);
+  }
+  function save(d) {
+    try { localStorage.setItem("mecenatCard", JSON.stringify(d)); } catch (e) {}
+  }
+
+  var data = load();
+
+  function $(id) { return document.getElementById(id); }
+  function setText(id, v) { var el = $(id); if (el) el.textContent = v; }
+
+  /* ---------- Render card + detail ---------- */
+  function render() {
+    // card
+    setText("c-ln", data.ln);
+    setText("c-fn", data.fn);
+    setText("c-dob", data.dob);
+    setText("c-number", data.number);
+    setText("c-sid", data.sid);
+    setText("c-school", data.school);
+    setText("c-dvt", data.dvt);
+    setText("c-edge", data.edge);
+    // detail
+    setText("d-ln", data.ln);
+    setText("d-fn", data.fn);
+    setText("d-dob", data.dob);
+    setText("d-dvt", data.dvt);
+    setText("d-sid", data.sid);
+    setText("d-school", data.school);
+    setText("d-schooltitle", data.school);
+    setText("t-sj", data.dvt);
+    setText("t-sl", data.dvt);
+    setText("t-bus", data.edge);
+  }
+  render();
+
+  /* ---------- View switching ---------- */
+  var screens = ["hem", "utforska", "kort", "kampanjer", "detail", "edit"];
+  function show(name, navName) {
+    screens.forEach(function (s) {
+      $("screen-" + s).classList.toggle("active", s === name);
+    });
+    // nav highlight (detail/edit keep a sensible tab lit)
+    var lit = navName || name;
+    document.querySelectorAll(".nav button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-tab") === lit);
+    });
+    // scroll each screen to top
+    var sc = $("screen-" + name).querySelector(".scroll");
+    if (sc) sc.scrollTop = 0;
+  }
+
+  document.querySelectorAll(".nav button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var tab = btn.getAttribute("data-tab");
+      if (tab === "nyheter") {
+        fillForm();
+        show("edit", "nyheter");
+      } else if (tab === "kort") {
+        show("kort");
+        openFull();          // KORT opens the dark card directly
+      } else {
+        show(tab);
+      }
+    });
+  });
+
+  /* ---------- Card -> fullscreen rotated view (screenshots 2/3) ---------- */
+  var fullcard = $("fullcard");
+  var fcHolder = $("fcHolder");
+
+  function fitFullcard() {
+    var card = fcHolder.querySelector(".card");
+    if (!card) return;
+    // card base: 430 wide, height = 430 / 1.586 ≈ 271
+    var w = 430, h = 430 / 1.586;
+    // reserve ~150px at the bottom for the "Valid thru" caption + X button
+    var availH = window.innerHeight - 150;
+    // after rotate(90deg): visual width = h, visual height = w
+    var s = Math.min((window.innerWidth * 0.96) / h, (availH * 0.98) / w);
+    // shift the card up so it sits centered above the caption/X
+    card.style.transform = "translateY(-58px) rotate(90deg) scale(" + s + ")";
+  }
+
+  function openFull() {
+    // clone the live card so it always reflects current data
+    var clone = $("theCard").cloneNode(true);
+    clone.removeAttribute("id");
+    clone.setAttribute("aria-label", "Öppna studentsidan");
+    // avoid duplicate IDs in the document
+    clone.querySelectorAll("[id]").forEach(function (n) { n.removeAttribute("id"); });
+    // tapping the dark card -> student page
+    clone.addEventListener("click", function () {
+      closeFull();
+      show("detail", "kort");
+    });
+    fcHolder.innerHTML = "";
+    fcHolder.appendChild(clone);
+    $("fcCaption").textContent = "Valid thru " + data.edge;
+    fitFullcard();
+    fullcard.classList.add("active");
+  }
+  function closeFull() {
+    fullcard.classList.remove("active");
+    fcHolder.innerHTML = "";
+  }
+
+  $("openCardBtn").addEventListener("click", openFull);
+  // Closing the fullscreen card returns to Home ("Hem")
+  $("fcClose").addEventListener("click", function () { closeFull(); show("hem"); });
+  fullcard.addEventListener("click", function (e) {
+    if (e.target === fullcard) { closeFull(); show("hem"); }   // tap black backdrop
+  });
+  window.addEventListener("resize", function () {
+    if (fullcard.classList.contains("active")) fitFullcard();
+  });
+
+  /* ---------- Student page ---------- */
+  $("detailClose").addEventListener("click", function () { show("kort"); });
+  $("editClose").addEventListener("click", function () { show("kort"); });
+
+  /* ---------- Edit form ---------- */
+  function fillForm() {
+    $("f-fn").value = data.fn;
+    $("f-ln").value = data.ln;
+    $("f-dob").value = data.dob;
+    $("f-number").value = data.number;
+    $("f-sid").value = data.sid;
+    $("f-school").value = data.school;
+    $("f-dvt").value = data.dvt;
+    $("f-edge").value = data.edge;
+  }
+
+  $("editForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    data.fn = $("f-fn").value.trim() || DEFAULTS.fn;
+    data.ln = $("f-ln").value.trim() || DEFAULTS.ln;
+    data.dob = $("f-dob").value.trim() || DEFAULTS.dob;
+    data.number = $("f-number").value.trim() || DEFAULTS.number;
+    data.sid = $("f-sid").value.trim() || DEFAULTS.sid;
+    data.school = $("f-school").value.trim() || DEFAULTS.school;
+    data.dvt = $("f-dvt").value.trim() || DEFAULTS.dvt;
+    data.edge = $("f-edge").value.trim() || DEFAULTS.edge;
+    save(data);
+    render();
+    var t = $("toast");
+    t.classList.add("show");
+    setTimeout(function () { t.classList.remove("show"); }, 1400);
+    setTimeout(function () { show("kort"); }, 650);
+  });
+
+  /* ---------- Live clock ---------- */
+  (function () {
+    var el = $("clock");
+    function pad(n) { return n < 10 ? "0" + n : "" + n; }
+    function tick() {
+      var d = new Date();
+      el.textContent = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  /* ---------- Block pinch / double-tap zoom ---------- */
+  document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
+  document.addEventListener("dblclick", function (e) { e.preventDefault(); }, { passive: false });
+</script>
+</body>
+</html>
