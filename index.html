@@ -597,7 +597,7 @@
             </div>
           </div>
           <div class="promo">
-            <div class="thumb"><img src="assets/Liseberg.png" alt="Liseberg" /><span class="kampanj">KAMPANJ</span><span class="brand">Liseberg</span></div>
+            <div class="thumb"><img src="assets/Lisebergbild.png" alt="Liseberg" /><span class="kampanj">KAMPANJ</span><span class="brand">Liseberg</span></div>
             <div class="body">
               <h3>Upp till 25&nbsp;% studentrabatt Entré &amp; åkband</h3>
               <div class="terms">Gäller utvalda datum…</div>
@@ -922,18 +922,21 @@
   var fullcard = $("fullcard");
   var fcHolder = $("fcHolder");
 
-  function fitFullcard() {
-    var wrap = fcHolder.querySelector(".fc-wrap");
-    if (!wrap) return;
-    // card base: 430 wide, height = 430 / 1.586 ≈ 271
-    var w = 430, h = 430 / 1.586;
-    // reserve ~130px at the bottom for the X button
-    var availH = window.innerHeight - 130;
-    // leave side room for the vertical "Valid thru" caption (0.84 width factor)
-    var s = Math.min((window.innerWidth * 0.84) / h, (availH * 0.98) / w);
-    // shift up so it sits centered above the X button; caption rotates with the card
-    wrap.style.transform = "translateY(-46px) rotate(90deg) scale(" + s + ")";
-  }
+function fitFullcard() {
+  var wrap = fcHolder.querySelector('.fc-wrap');
+  if (!wrap) return;
+
+  var w = 430, h = 430 / 1.486;
+  var availH = window.innerHeight - 150;
+  var sideGap = 52; // much bigger left/right gap
+
+  var s = Math.min(
+    ((window.innerWidth - sideGap * 2) / h),
+    (availH * 0.88) / w
+  );
+
+  wrap.style.transform = `translateY(-46px) rotate(90deg) scale(${s})`;
+}
 
   function openFull() {
     // clone the live card so it always reflects current data
