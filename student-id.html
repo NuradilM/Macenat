@@ -129,7 +129,9 @@
   .banner {
     border-radius: 16px;
     overflow: hidden;
-    background: linear-gradient(150deg, #a03d63 0%, #d15b39 55%, #ef8a2a 100%);
+    background:
+      linear-gradient(150deg, rgba(160,61,99,.82) 0%, rgba(209,91,57,.62) 55%, rgba(239,138,42,.55) 100%),
+      url("assets/Hero_image.png") center/cover no-repeat;
     color: #fff;
     padding: 26px 22px 24px;
     text-align: center;
@@ -179,10 +181,15 @@
   .promo .thumb {
     height: 120px;
     position: relative;
+    overflow: hidden;
     background: linear-gradient(135deg,#cbd2da,#9aa6b2);
   }
-  .promo .thumb.z { background: linear-gradient(135deg,#d8d2c8,#b6a894); }
-  .promo .thumb.l { background: linear-gradient(135deg,#e8a5b0,#d76b7f); }
+  .promo .thumb img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
   .kampanj {
     position: absolute; top: 10px; left: 10px;
     background: var(--orange); color: #fff;
@@ -581,7 +588,7 @@
         </div>
         <div class="hscroll">
           <div class="promo">
-            <div class="thumb z"><span class="kampanj">KAMPANJ</span><span class="brand">zalando</span></div>
+            <div class="thumb"><img src="assets/zalando.png" alt="Zalando" /><span class="kampanj">KAMPANJ</span><span class="brand">zalando</span></div>
             <div class="body">
               <h3>Upp till 70&nbsp;% + 10&nbsp;% extra studentrabatt</h3>
               <div class="terms">Gäller nya kunder vid köp öv…</div>
@@ -589,7 +596,7 @@
             </div>
           </div>
           <div class="promo">
-            <div class="thumb l"><span class="kampanj">KAMPANJ</span><span class="brand">Liseberg</span></div>
+            <div class="thumb"><img src="assets/Liseberg.png" alt="Liseberg" /><span class="kampanj">KAMPANJ</span><span class="brand">Liseberg</span></div>
             <div class="body">
               <h3>Upp till 25&nbsp;% studentrabatt Entré &amp; åkband</h3>
               <div class="terms">Gäller utvalda datum…</div>
@@ -603,11 +610,11 @@
         </div>
         <div class="hscroll">
           <div class="promo">
-            <div class="thumb" style="background:linear-gradient(135deg,#f4c9d4,#e79ab0)"><span class="kampanj">KAMPANJ</span><span class="brand">Foodora</span></div>
+            <div class="thumb"><img src="assets/foodora.png" alt="Foodora" /><span class="kampanj">KAMPANJ</span><span class="brand">Foodora</span></div>
             <div class="body"><h3>Fri leverans i 30 dagar</h3><div class="terms">Gäller nya kunder…</div><button class="btn">Till rabatten</button></div>
           </div>
           <div class="promo">
-            <div class="thumb" style="background:linear-gradient(135deg,#f6d38a,#e79b3a)"><span class="kampanj">KAMPANJ</span><span class="brand">MatHem</span></div>
+            <div class="thumb"><img src="assets/mathem.png" alt="MatHem" /><span class="kampanj">KAMPANJ</span><span class="brand">MatHem</span></div>
             <div class="body"><h3>15&nbsp;% på din första kasse</h3><div class="terms">Gäller utvalda…</div><button class="btn">Till rabatten</button></div>
           </div>
         </div>
