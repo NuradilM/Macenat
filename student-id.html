@@ -305,64 +305,72 @@
   .verified-row { display: flex; align-items: flex-end; gap: 8px; }
   .logo-sj { height: 22px; width: auto; display: block; object-fit: contain; }
 
-  /* Verified box: VERIFIED BY / OW / Mecenat stack, then [book][SL] row */
+  /* No outer box — the two boxes stack and share an edge, same size */
   .verified {
-    border: 1px solid #b8c0cc;
-    border-radius: 8px;
-    background: rgba(255,255,255,.55);
-    padding: 6px 10px 7px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    align-items: stretch;         /* both boxes take the same width */
+    gap: 0;
   }
+  /* Mecenat logo + text in their own box (transparent, card background shows through) */
   .mec-stack {
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;      /* Mecenat text starts where the logo starts */
+    justify-content: center;
+    border: 1.5px solid #b8c0cc;
+    border-radius: 8px;
+    background: transparent;
+    padding: 5px 9px;
+    min-height: 58px;
+    box-sizing: border-box;
   }
+  .mec-stack > .vlabel,
+  .mec-stack > .v-ow,
+  .mec-stack > .v-text { position: relative; z-index: 1; }
   .mec-stack .vlabel { font-size: 6.5px; font-weight: 800; letter-spacing: 1px; color: #55606f; }
-  .mec-stack .v-ow { height: 26px; width: auto; margin-top: 3px; overflow: visible; }
-  .mec-stack .v-text { height: 13px; width: auto; margin-top: 3px; overflow: visible; }
+  .mec-stack .v-ow { height: 26px; width: auto; margin-top: 2px; overflow: visible; }
+  .mec-stack .v-text { height: 12px; width: auto; margin-top: 2px; overflow: visible; }
 
+  /* book + SL box — same size as the Mecenat box, its top edge on the box above */
   .mini-col {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 100%;
-    border: 1px solid #c2cad4;
-    border-radius: 6px;
-    padding: 3px 6px;
+    gap: 10px;
+    border: 1.5px solid #b8c0cc;
+    border-radius: 8px;
+    background: transparent;
+    padding: 5px 9px;
+    min-height: 58px;
+    box-sizing: border-box;
+    margin-top: -1.5px;           /* share the edge with the Mecenat box */
   }
   .mini-col .logo-book { height: 20px; width: auto; display: block; object-fit: contain; }
-  .mini-col .logo-sl { height: 26px; width: auto; display: block; object-fit: contain; }
+  .mini-col .logo-sl { height: 28px; width: auto; display: block; object-fit: contain; }
 
-  /* Pulsing orange rings — 2 rings, 3s cycle */
+  /* Two orange rings (inner + outer) emanating from the OW logo,
+     slightly above centre — slow, subtle "breathing", medium -> a bit bigger */
   .pulse-wrap {
     position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
+    left: 50%; top: 44%;         /* centred on the OW logo, a touch above middle */
+    width: 0; height: 0;
     pointer-events: none;
-    overflow: visible;
-    z-index: 5;
+    z-index: 0;
   }
   .pulse-ring {
     position: absolute;
-    width: 40px; height: 40px;
     border-radius: 50%;
-    border: 3px solid var(--orange);
-    opacity: 0;
-    animation: ringPulse 3s cubic-bezier(.2,.6,.3,1) infinite;
+    border: 2.5px solid var(--orange);
+    animation: ringBreath 4.5s ease-in-out infinite;
   }
-  .pulse-ring:nth-child(2) { animation-delay: 1.5s; }
-  @keyframes ringPulse {
-    0%   { transform: scale(.4); opacity: 0; }
-    12%  { opacity: .9; }
-    100% { transform: scale(2.3); opacity: 0; }
+  .pr-inner { width: 48px; height: 48px; margin: -24px 0 0 -24px; }
+  .pr-outer { width: 74px; height: 74px; margin: -37px 0 0 -37px; }
+  @keyframes ringBreath {
+    0%, 100% { transform: scale(1);    opacity: .55; }
+    50%      { transform: scale(1.14); opacity: .28; }
   }
 
   .card-valid { text-align: right; }
@@ -405,14 +413,20 @@
     transform-origin: center center;
     box-shadow: 0 0 46px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.8);
   }
-  /* "Valid thru" caption under the card */
-  .fc-caption {
-    position: absolute; left: 0; right: 0;
-    bottom: calc(env(safe-area-inset-bottom) + 84px);
-    color: #fff; font-size: 15px; font-weight: 600; letter-spacing: .3px;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+  /* Wrapper that holds the card + the vertical "Valid thru" caption, rotated together */
+  .fc-wrap { position: relative; width: 430px; }
+  .fc-wrap .card { width: 100%; }
+  /* "Valid thru" sits just outside the card, below the SL box; rotates with the card */
+  .fc-vcaption {
+    position: absolute;
+    top: 100%;                 /* just past the card's (landscape) bottom edge */
+    right: 26px;               /* aligned under the SL / verified cluster */
+    margin-top: 10px;
+    display: flex; align-items: center; gap: 9px;
+    white-space: nowrap;
+    color: #fff; font-size: 17px; font-weight: 700; letter-spacing: .3px;
   }
-  .fc-caption img { height: 18px; width: auto; filter: invert(1) brightness(2); object-fit: contain; }
+  .fc-vcaption img { height: 22px; width: auto; object-fit: contain; }
   .fc-close {
     position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 16px);
     transform: translateX(-50%);
@@ -665,8 +679,8 @@
             <div class="verified">
               <div class="mec-stack">
                 <div class="pulse-wrap">
-                  <span class="pulse-ring"></span>
-                  <span class="pulse-ring"></span>
+                  <span class="pulse-ring pr-outer"></span>
+                  <span class="pulse-ring pr-inner"></span>
                 </div>
                 <div class="vlabel">VERIFIED BY</div>
                 <svg class="v-ow" viewBox="0.3 0.88 188.5 91.5"><use href="#owMark"/></svg>
@@ -774,7 +788,6 @@
   <!-- ========================= FULLSCREEN CARD ========================= -->
   <div class="fullcard" id="fullcard">
     <div class="fc-holder" id="fcHolder"></div>
-    <div class="fc-caption"><img src="assets/book.png" alt="" /><span id="fcCaption">Valid thru 2026-09-15</span></div>
     <button class="fc-close" id="fcClose" aria-label="Stäng">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </button>
@@ -899,16 +912,16 @@
   var fcHolder = $("fcHolder");
 
   function fitFullcard() {
-    var card = fcHolder.querySelector(".card");
-    if (!card) return;
+    var wrap = fcHolder.querySelector(".fc-wrap");
+    if (!wrap) return;
     // card base: 430 wide, height = 430 / 1.586 ≈ 271
     var w = 430, h = 430 / 1.586;
-    // reserve ~150px at the bottom for the "Valid thru" caption + X button
-    var availH = window.innerHeight - 150;
-    // after rotate(90deg): visual width = h, visual height = w
-    var s = Math.min((window.innerWidth * 0.96) / h, (availH * 0.98) / w);
-    // shift the card up so it sits centered above the caption/X
-    card.style.transform = "translateY(-58px) rotate(90deg) scale(" + s + ")";
+    // reserve ~130px at the bottom for the X button
+    var availH = window.innerHeight - 130;
+    // leave side room for the vertical "Valid thru" caption (0.84 width factor)
+    var s = Math.min((window.innerWidth * 0.84) / h, (availH * 0.98) / w);
+    // shift up so it sits centered above the X button; caption rotates with the card
+    wrap.style.transform = "translateY(-46px) rotate(90deg) scale(" + s + ")";
   }
 
   function openFull() {
@@ -923,9 +936,16 @@
       closeFull();
       show("detail", "kort");
     });
+    // wrap card + vertical "Valid thru" caption so they rotate together
+    var wrap = document.createElement("div");
+    wrap.className = "fc-wrap";
+    wrap.appendChild(clone);
+    var cap = document.createElement("div");
+    cap.className = "fc-vcaption";
+    cap.innerHTML = '<img src="assets/output-onlinepngtools.png" alt="" /> Valid thru ' + data.edge;
+    wrap.appendChild(cap);
     fcHolder.innerHTML = "";
-    fcHolder.appendChild(clone);
-    $("fcCaption").textContent = "Valid thru " + data.edge;
+    fcHolder.appendChild(wrap);
     fitFullcard();
     fullcard.classList.add("active");
   }
