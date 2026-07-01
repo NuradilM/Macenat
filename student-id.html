@@ -429,7 +429,7 @@
   }
   .fc-vcaption img { height: 22px; width: auto; object-fit: contain; }
   .fc-close {
-    position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 16px);
+    position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 46px);
     transform: translateX(-50%);
     width: 56px; height: 56px; border-radius: 50%;
     background: #fff; border: none; cursor: pointer;
@@ -456,9 +456,11 @@
   .d-head .vbox {
     border: 1px solid #ccd2da; border-radius: 8px; padding: 8px 12px; text-align: center;
     min-width: 116px;
+    display: flex; flex-direction: column; align-items: center;
   }
   .d-head .vbox .vlabel { font-size: 9px; font-weight: 800; letter-spacing: .8px; color: #55606f; }
-  .d-head .vbox .mec { height: 30px; margin-top: 6px; }
+  .d-head .vbox .v-ow { height: 28px; width: auto; margin-top: 6px; overflow: visible; }
+  .d-head .vbox .v-text { height: 17px; width: auto; margin-top: 4px; overflow: visible; }
   .d-dvt { text-align: right; font-size: 11px; font-weight: 800; letter-spacing: .5px; color: #55606f; }
   .d-dvt .date { font-size: 20px; font-weight: 500; color: var(--ink); letter-spacing: 0; }
   .d-note { margin-top: 16px; font-size: 15px; color: #3a3f48; line-height: 1.4; }
